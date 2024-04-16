@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package municion;
+
+message SolicitudMunicionRequest {
+  string id_equipo = 1;
+  int32 cantidad_at = 2;
+  int32 cantidad_mp = 3;
+}
+
+message SolicitudMunicionResponse {
+  bool aprobado = 1;
+}
+
