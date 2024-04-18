@@ -2,13 +2,24 @@ syntax = "proto3";
 
 package municion;
 
-message SolicitudMunicionRequest {
-  string id_equipo = 1;
-  int32 cantidad_at = 2;
-  int32 cantidad_mp = 3;
+option go_package = ".";
+
+// Definición del mensaje para la solicitud de munición
+message MunicionRequest {
+  int32 team_id = 1;
+  int32 at_count = 2;
+  int32 mp_count = 3;
 }
 
-message SolicitudMunicionResponse {
-  bool aprobado = 1;
+// Definición del mensaje para la respuesta de la solicitud de munición
+message MunicionResponse {
+  bool approved = 1;
+  int32 available_at = 2;
+  int32 available_mp = 3;
 }
 
+// Definición del servicio para la comunicación entre Tierra y Equipos de Combate
+service MunicionService {
+  // Método para solicitar munición
+  rpc RequestMunicion(MunicionRequest) returns (MunicionResponse);
+}
