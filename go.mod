@@ -6,3 +6,7 @@ require (
 	google.golang.org/grpc v1.63.2
 	google.golang.org/protobuf v1.33.0
 )
+
+replace (
+    github.com/Zurickata/Lab_2_Distribuidos/proto => ../proto
+)
