@@ -8,6 +8,7 @@ import (
     "net"
     "strconv"
     "time"
+	"sync"
 )
 
 // MunicionServer representa el servidor gRPC de la Tierra
@@ -15,10 +16,15 @@ type MunicionServer struct {
     pb.UnimplementedMunicionServiceServer
     availableAt int32
 	availableMp int32
+	mutex sync.Mutex
 }
 
 // RequestMunicion implementa el método gRPC para solicitar munición
 func (s *MunicionServer) RequestMunicion(ctx context.Context, req *pb.MunicionRequest) (*pb.MunicionResponse, error) {
+    // Bloquear el acceso concurrente a los contadores de munición
+    s.mutex.Lock()
+	defer s.mutex.Unlock()
+
     // Formatear la cadena y convertir los valores enteros a cadenas
 	message := fmt.Sprintf("Recepción de solicitud desde equipo %s, %s AT y %s MP",
     strconv.Itoa(int(req.GetTeamId())),
@@ -61,10 +67,12 @@ func main() {
     fmt.Println("Servidor en ejecución en el puerto 50051...")
     serv := grpc.NewServer()
     pb.RegisterMunicionServiceServer(serv, server)
+    
     go func() {
 		for {
 			// Incrementar los contadores de munición cada 5 segundos
 			time.Sleep(5 * time.Second)
+            server.mutex.Lock()
 			server.availableAt += 10
 			server.availableMp += 5
 
@@ -75,7 +83,7 @@ func main() {
 			if server.availableMp > 20 {
 				server.availableMp = 20
 			}
-
+            server.mutex.Unlock()
             fmt.Println("NUEVA DATA: AT EN SISTEMA:" + strconv.Itoa(int(server.availableAt)) + " ; MP EN SISTEMA:" + strconv.Itoa(int(server.availableMp)))
 		}
 	}()
@@ -85,5 +93,4 @@ func main() {
         fmt.Println("No se pudo levantar el servidor: " + err.Error())
         return
     } 
-    fmt.Println("Servidor detenido")
 }

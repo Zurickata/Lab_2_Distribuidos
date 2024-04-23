@@ -7,6 +7,7 @@ import (
     "google.golang.org/grpc"
     "math/rand"
     "time"
+	"sync"
 )
 
 func main() {
@@ -20,13 +21,34 @@ func main() {
     // Crear un cliente gRPC
     serviceClient := pb.NewMunicionServiceClient(conn)
 
+	// Crear un WaitGroup para esperar que todas las goroutines finalicen
+	var wg sync.WaitGroup
+
+	// Iniciar cuatro goroutines
+	for i := 0; i < 4; i++ {
+		wg.Add(1)
+		go func(id int) {
+			defer wg.Done()
+			sendRequestsMunicion(serviceClient, id)
+		}(i + 1)
+	}
+
+	// Esperar a que todas las goroutines finalicen
+	wg.Wait()
+}
+
+// Función para enviar las Requests
+func sendRequestsMunicion(serviceClient pb.MunicionServiceClient, id int) {
 	for {
+		// Espera los 10 seg correspondientes
+		time.Sleep(10 * time.Second)
+
 		// Crear una solicitud con cantidades aleatorias
-        idTeam := int32(randomInRange(1, 4))
+		idTeam := int32(id)
 		atCount := int32(randomInRange(10, 20))
 		mpCount := int32(randomInRange(5, 10))
 
-        message := fmt.Sprintf("Solicitando %d AT y %d MP", atCount, mpCount)
+		message := fmt.Sprintf("Solicitando %d AT y %d MP", atCount, mpCount)
 
 		// Enviar la solicitud al servidor
 		res, err := serviceClient.RequestMunicion(context.Background(), &pb.MunicionRequest{
