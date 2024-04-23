@@ -1,25 +1,26 @@
 package main
 
 import (
-    pb "github.com/Zurickata/Lab_2_Distribuidos/proto"
-    "context"
-    "fmt"
-    "google.golang.org/grpc"
-    "math/rand"
-    "time"
+	"context"
+	"fmt"
+	"math/rand"
 	"sync"
+	"time"
+
+	pb "github.com/Zurickata/Lab_2_Distribuidos/proto"
+	"google.golang.org/grpc"
 )
 
 func main() {
-    // Conexión al servidor gRPC
-    conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
-    if err != nil {
-        fmt.Println("No se pudo conectar con el servidor: " + err.Error())
-    }
-    defer conn.Close()
+	// Conexión al servidor gRPC
+	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+	if err != nil {
+		fmt.Println("No se pudo conectar con el servidor: " + err.Error())
+	}
+	defer conn.Close()
 
-    // Crear un cliente gRPC
-    serviceClient := pb.NewMunicionServiceClient(conn)
+	// Crear un cliente gRPC
+	serviceClient := pb.NewMunicionServiceClient(conn)
 
 	// Crear un WaitGroup para esperar que todas las goroutines finalicen
 	var wg sync.WaitGroup
@@ -45,8 +46,8 @@ func sendRequestsMunicion(serviceClient pb.MunicionServiceClient, id int) {
 
 		// Crear una solicitud con cantidades aleatorias
 		idTeam := int32(id)
-		atCount := int32(randomInRange(10, 20))
-		mpCount := int32(randomInRange(5, 10))
+		atCount := int32(randomInRange(20, 30))
+		mpCount := int32(randomInRange(10, 15))
 
 		message := fmt.Sprintf("Solicitando %d AT y %d MP", atCount, mpCount)
 
