@@ -13,8 +13,8 @@ import (
 
 // MunicionServer representa el servidor gRPC de la Tierra
 type MunicionServer struct {
-    pb.UnimplementedMunicionServiceServer
-    availableAt int32
+	pb.UnimplementedMunicionServiceServer
+	availableAt int32
 	availableMp int32
 	mutex sync.Mutex
 }
@@ -27,14 +27,14 @@ func (s *MunicionServer) RequestMunicion(ctx context.Context, req *pb.MunicionRe
 
     // Formatear la cadena y convertir los valores enteros a cadenas
 	message := fmt.Sprintf("Recepción de solicitud desde equipo %s, %s AT y %s MP",
-    strconv.Itoa(int(req.GetTeamId())),
-    strconv.Itoa(int(req.GetAtCount())),
-    strconv.Itoa(int(req.GetMpCount())))
+		strconv.Itoa(int(req.GetTeamId())),
+		strconv.Itoa(int(req.GetAtCount())),
+		strconv.Itoa(int(req.GetMpCount())))
 
-    // Lógica para procesar la solicitud de munición
-    if req.AtCount > s.availableAt || req.MpCount > s.availableMp {
-        // Imprimir el mensaje formateado
-        fmt.Println(message + "-- DENEGADA -- AT EN SISTEMA:" + strconv.Itoa(int(s.availableAt)) + " ; MP EN SISTEMA:" + strconv.Itoa(int(s.availableMp)))
+	// Lógica para procesar la solicitud de munición
+	if req.AtCount > s.availableAt || req.MpCount > s.availableMp {
+		// Imprimir el mensaje formateado
+		fmt.Println(message + "-- DENEGADA -- AT EN SISTEMA:" + strconv.Itoa(int(s.availableAt)) + " ; MP EN SISTEMA:" + strconv.Itoa(int(s.availableMp)))
 		return &pb.MunicionResponse{Approved: false}, nil
 	}
 
@@ -42,26 +42,26 @@ func (s *MunicionServer) RequestMunicion(ctx context.Context, req *pb.MunicionRe
 	s.availableAt -= req.AtCount
 	s.availableMp -= req.MpCount
 
-    // Imprimir el mensaje formateado
-    fmt.Println(message + "-- APROBADA -- AT EN SISTEMA:" + strconv.Itoa(int(s.availableAt)) + " ; MP EN SISTEMA:" + strconv.Itoa(int(s.availableMp)))
+	// Imprimir el mensaje formateado
+	fmt.Println(message + "-- APROBADA -- AT EN SISTEMA:" + strconv.Itoa(int(s.availableAt)) + " ; MP EN SISTEMA:" + strconv.Itoa(int(s.availableMp)))
 
-    // Se puede implementar la lógica para verificar el inventario y responder adecuadamente
-    return &pb.MunicionResponse{Approved: true,}, nil
+	// Se puede implementar la lógica para verificar el inventario y responder adecuadamente
+	return &pb.MunicionResponse{Approved: true}, nil
 }
 
 func main() {
-    // Inicializar el servidor con los contadores de munición en cero
+	// Inicializar el servidor con los contadores de munición en cero
 	server := &MunicionServer{
 		availableAt: 0,
 		availableMp: 0,
 	}
 
-    // Crear un Listener gRPC
-    conn, err := net.Listen("tcp", ":50051")
-    if err != nil {
-        fmt.Println("No se pudo crear la conexion TCP: " + err.Error())
-        return
-    }
+	// Crear un Listener gRPC
+	conn, err := net.Listen("tcp", ":50051")
+	if err != nil {
+		fmt.Println("No se pudo crear la conexion TCP: " + err.Error())
+		return
+	}
 
     // Iniciar el servidor gRPC
     fmt.Println("Servidor en ejecución en el puerto 50051...")
